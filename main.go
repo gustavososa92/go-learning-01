@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -17,11 +18,11 @@ func main() {
 	var texto string = "El resultado es:"
 	otroTexto := "LALALA"
 
-	var gorraNegra = Gorra  {
-		marca:"nike",
-		color: "negra",
+	var gorraNegra = Gorra{
+		marca:  "nike",
+		color:  "negra",
 		precio: 10.5,
-		plana: false,
+		plana:  false,
 	}
 
 	fmt.Println("Hola Mundo")
@@ -29,5 +30,24 @@ func main() {
 	fmt.Println(texto, suma)
 	fmt.Println(gorraNegra)
 	fmt.Println(gorraNegra.marca)
+	fmt.Println(operacion(10, 5, "+"))
+	fmt.Println(operacion(10, 5, "-"))
+	fmt.Println(operacion(10, 5, "*"))
+	fmt.Println(operacion(10, 5, "/"))
+	fmt.Println(operacion(10, 5, "/+"))
 	time.Sleep(time.Second * 1)
+}
+
+func operacion(n1 float32, n2 float32, op string) (float32, error) {
+	switch op {
+	case "+":
+		return n1 + n2, nil
+	case "-":
+		return n1 - n2, nil
+	case "*":
+		return n1 * n2, nil
+	case "/":
+		return n1 / n2, nil
+	}
+	return 0, errors.New("No soportado")
 }
