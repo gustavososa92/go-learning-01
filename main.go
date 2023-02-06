@@ -3,7 +3,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"time"
 )
 
 type Gorra struct {
@@ -35,7 +34,14 @@ func main() {
 	fmt.Println(operacion(10, 5, "*"))
 	fmt.Println(operacion(10, 5, "/"))
 	fmt.Println(operacion(10, 5, "/+"))
-	time.Sleep(time.Second * 1)
+	fmt.Println(gorras(45, "$"))
+}
+
+func gorras(pedido float32, moneda string) (string, string, float32) {
+	precio := func() float32 {
+		return pedido * 7
+	}
+	return "EL precio total de gorras es:", moneda, precio()
 }
 
 func operacion(n1 float32, n2 float32, op string) (float32, error) {
