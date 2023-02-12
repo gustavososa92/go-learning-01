@@ -66,9 +66,7 @@ func MoviesList(w http.ResponseWriter, r *http.Request) {
 
 	defer cursor.Close(context.TODO())
 
-	json.NewEncoder(w).Encode(results)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	response(w, http.StatusOK, results)
 }
 
 func MovieById(w http.ResponseWriter, r *http.Request) {
@@ -92,9 +90,7 @@ func MovieById(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 		return
 	}
-	json.NewEncoder(w).Encode(result)
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	response(w, http.StatusOK, result)
 }
 
 func MovieAdd(w http.ResponseWriter, r *http.Request) {
@@ -116,7 +112,11 @@ func MovieAdd(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	json.NewEncoder(w).Encode(movieData)
+	response(w, http.StatusOK, movieData)
+}
+
+func response(w http.ResponseWriter, status int, result interface{}) {
+	json.NewEncoder(w).Encode(result)
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(200)
+	w.WriteHeader(status)
 }
