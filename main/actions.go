@@ -9,6 +9,7 @@ import (
 
 	"github.com/gorilla/mux"
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -75,7 +76,25 @@ func MovieById(w http.ResponseWriter, r *http.Request) {
 	params := mux.Vars(r)
 	movieId := params["id"]
 
-	fmt.Fprintf(w, "Pelicula por id: %s", movieId)
+	oid, err := primitive.ObjectIDFromHex(movieId)
+
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(404)
+		return
+	}
+	result := Movie{}
+
+	filter := bson.D{{Key: "_id", Value: oid}}
+	err = moviesCollection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(404)
+		return
+	}
+	json.NewEncoder(w).Encode(result)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
 }
 
 func MovieAdd(w http.ResponseWriter, r *http.Request) {
