@@ -4,24 +4,26 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"github.com/gorilla/mux"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"net/http"
+
+	"github.com/gorilla/mux"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 func getSession() *mongo.Client {
 
 	credential := options.Credential{
 		AuthSource: "moviesGO",
-		Username: "admin",
-		Password: "password",
-	 }
+		Username:   "admin",
+		Password:   "password",
+	}
 
-	 clientOpts := options.Client().ApplyURI("mongodb://localhost:27017").SetAuth(credential)
+	clientOpts := options.Client().ApplyURI("mongodb://localhost:27017").SetAuth(credential)
 
-	 client, err := mongo.Connect(context.TODO(), clientOpts)
+	client, err := mongo.Connect(context.TODO(), clientOpts)
 
 	if err != nil {
 		panic(err)
@@ -33,18 +35,39 @@ func getSession() *mongo.Client {
 
 var moviesCollection = getSession().Database("moviesGO").Collection("movies")
 
-var movies = Movies{
-	Movie{"PELI 1", 2020, "Yo1"},
-	Movie{"PELI 2", 1999, "Yo2"},
-	Movie{"PELI 3", 2022, "Yo3"},
-}
-
 func Index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "HOME PAGE")
+	var movies = MoviesDoc{
+		Movie{"PELI 1", 2020, "Yo1"},
+		Movie{"PELI 2", 1999, "Yo2"},
+		Movie{"PELI 3", 2022, "Yo3"},
+	}
+	_, err := moviesCollection.InsertMany(context.TODO(), movies)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(500)
+		return
+	}
+	fmt.Fprintf(w, "HOME PAGE - ADDED MOVIES")
 }
 
 func MoviesList(w http.ResponseWriter, r *http.Request) {
-	json.NewEncoder(w).Encode(movies)
+	var results []Movie
+
+	cursor, err := moviesCollection.Find(context.TODO(), bson.D{})
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		panic(err)
+	}
+
+	defer cursor.Close(context.TODO())
+
+	json.NewEncoder(w).Encode(results)
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
 }
 
 func MovieById(w http.ResponseWriter, r *http.Request) {

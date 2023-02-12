@@ -7,3 +7,5 @@ type Movie struct {
 }
 
 type Movies []Movie
+
+type MoviesDoc []interface{}
