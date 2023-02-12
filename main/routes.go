@@ -41,4 +41,10 @@ var routes = Routes{
 		"/movies/{id}",
 		MovieById,
 	},
+	Route{
+		"MovieAdd",
+		"Post",
+		"/movies",
+		MovieAdd,
+	},
 }
