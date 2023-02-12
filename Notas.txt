@@ -1,0 +1,32 @@
+Dependencias por consola
+Router
+     go get github.com/gorilla/mux
+Mongo
+    go get gopkg.in/mgo.v2
+    go get gopkg.in/mgo.v2/bson
+
+
+docker-compose up
+docker exec -it mongodbGO bash
+
+mongosh -u admin -p password --authenticationDatabase
+
+db.createUser({
+  user: "admin",
+  pwd: "password",
+  roles: [
+    {
+      role: "readWrite",
+      db: "moviesGO",
+    },
+  ],
+});
+
+
+go mod tidy 
+go mod vendor 
+go build 
+go run .
+
+
+
