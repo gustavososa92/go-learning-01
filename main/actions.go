@@ -115,6 +115,40 @@ func MovieAdd(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, movieData)
 }
 
+func MovieUpdate(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	movieId := params["id"]
+
+	oid, err := primitive.ObjectIDFromHex(movieId)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(404)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var movieData Movie
+	err = decoder.Decode(&movieData)
+	if err != nil {
+		panic(err)
+	}
+	defer r.Body.Close()
+
+	log.Println(movieData)
+
+	filter := bson.D{{Key: "_id", Value: oid}}
+	update := bson.M{"$set": movieData}
+	_, err = moviesCollection.UpdateOne(context.TODO(), filter, update)
+
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(404)
+		return
+	}
+	response(w, http.StatusOK, movieData)
+}
+
 func response(w http.ResponseWriter, status int, result interface{}) {
 	json.NewEncoder(w).Encode(result)
 	w.Header().Set("Content-Type", "application/json")
