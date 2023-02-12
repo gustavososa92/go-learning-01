@@ -149,6 +149,31 @@ func MovieUpdate(w http.ResponseWriter, r *http.Request) {
 	response(w, http.StatusOK, movieData)
 }
 
+func MovieDelete(w http.ResponseWriter, r *http.Request) {
+
+	params := mux.Vars(r)
+	movieId := params["id"]
+
+	oid, err := primitive.ObjectIDFromHex(movieId)
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(404)
+		return
+	}
+
+	filter := bson.D{{Key: "_id", Value: oid}}
+
+	_, err = moviesCollection.DeleteOne(context.TODO(), filter)
+
+	if err != nil {
+		log.Println(err)
+		w.WriteHeader(404)
+		return
+	}
+	
+	response(w, http.StatusOK, "ELIMINADO OK")
+}
+
 func response(w http.ResponseWriter, status int, result interface{}) {
 	json.NewEncoder(w).Encode(result)
 	w.Header().Set("Content-Type", "application/json")

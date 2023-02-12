@@ -53,4 +53,10 @@ var routes = Routes{
 		"/movies/{id}",
 		MovieUpdate,
 	},
+	Route{
+		"MovieDelete",
+		"Delete",
+		"/movies/{id}",
+		MovieDelete,
+	},
 }
